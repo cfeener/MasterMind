@@ -5,13 +5,14 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>	//For malloc and free
+#include <stdlib.h>	//For malloc() and free()
+#include <time.h>	//For time()
 #include <stdbool.h>
 
 #define BUF_SIZE 512
 
 typedef struct board {	//Top of Hierarchy
-	int num_row;	//Maximum number of guesses
+	int num_rows;	//Maximum number of guesses
 	int row_size;	//Size of code_ and key_peg arrays.
 	struct row * row_array;
 	int * answer;
@@ -26,29 +27,36 @@ typedef struct row {
 void setAnswer(Board * b) {
 	int i, n = b->row_size;
 	b->answer = (int *)calloc(n, sizeof(int));
+	srand(time(0));
 	for (i = 0; i < n; i++)
 		b->answer[i] = rand() % 4;
 }
 
-Board * createBoard(int n_row, int r_size) {
+Row * createRow(int row_size) {
+	Row * r = (Row *)malloc(sizeof(Row));
+	r->code_pegs = (int *)calloc(row_size, sizeof(int));
+	r->key_pegs = (int *)calloc(row_size, sizeof(int));
+	return r;
+}
+
+Board * createBoard(int num_rows, int row_size) {
 	Board * b = (Board *)malloc(sizeof(Board));
-	b->num_row = n_row;
-	b->row_size = r_size;
-	b->row_array = (Row *)calloc(b->num_row, sizeof(Row));
-	setAnswer(b);	//Random
+	int i;
+	for (i = 0; i < num_rows; i++)
+		b->row_array[i] = createRow(row_size);
+	b->num_rows = num_rows;
+	b->row_size = row_size;
+	setAnswer(b);	//Random generated
 	return b;
 }
 
 void freeBird(Board * b) {
+	int i, n = b->num_rows;
+	for (i = 0; i < n; i++)
+		free(b->row_array[i]);
 	free(b->row_array);
 	free(b->answer);
 	free(b);
-}
-
-Row * createRow(int row_size) {
-	Row * r = (Row *)malloc(sizeof(Row));
-	r->row_size = row_size;
-	return r;
 }
 
 int input(char * str, int def) {
@@ -60,6 +68,25 @@ int input(char * str, int def) {
 			printf("\nValue set.\n");
 	}
 	return val;
+}
+
+void printAns(Board * b) {
+	int i, n = b->row_size; 
+	for (i = 0; i < n; i++)
+		printf("%i ", b->answer[i]);
+	printf("\n");
+}
+
+void printBoard(Board * b) {
+	int i, j, y = b->num_rows, x = b->row_size;
+	for (i = 0; i < y; i++) {
+		for (j = 0; j < x; j++)
+			printf("%i ", b->row_array[i].code_pegs[j]);
+		printf(" ...  ");
+		for (j = 0; j < x; j++)
+			printf("%i ", b->row_array[i].key_pegs[j]);
+		printf("\n");
+	}
 }
 
 int main(void) {
@@ -75,9 +102,10 @@ int main(void) {
 	printf("Colors: %i, Guesses: %i, Length: %i\n", num_colors, num_row, row_size);
 
 	Board * B = createBoard(num_row, row_size);
-	int i; 
-	for (i = 0; i < row_size; i++)
-		printf("%i ", B->answer[i]);
+
+	printBoard(B);
+
+	printAns(B);
 
 	freeBird(B);
 	return 0;
