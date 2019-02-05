@@ -14,13 +14,13 @@
 typedef struct board {	//Top of Hierarchy
 	int num_rows;	//Maximum number of guesses
 	int row_size;	//Size of code_ and key_peg arrays.
-	struct row * row_array;
+	struct row ** row_array;	//TODO: Array of pointers
 	int * answer;
 } Board;
 
 typedef struct row {
-	int * code_pegs;	//Assigned to C colors
 	int row_size;	//Size of code_ and key_pegs arrays.
+	int * code_pegs;	//Assigned to C colors
 	int * key_pegs;	//Either empty, white, or red
 } Row;
 
@@ -36,12 +36,24 @@ Row * createRow(int row_size) {
 	Row * r = (Row *)malloc(sizeof(Row));
 	r->code_pegs = (int *)calloc(row_size, sizeof(int));
 	r->key_pegs = (int *)calloc(row_size, sizeof(int));
+	int i; 
+	for (i = 0; i < row_size; i++)
+		r->code_pegs[i] = 0;
+	for (i = 0; i < row_size; i++)
+		r->key_pegs[i] = 0;
 	return r;
+}
+
+void freeRow(Row * r) {
+	free(r->code_pegs);
+	free(r->key_pegs);
+	free(r);
 }
 
 Board * createBoard(int num_rows, int row_size) {
 	Board * b = (Board *)malloc(sizeof(Board));
 	int i;
+	b->row_array = (Row **)malloc(sizeof(Row *));
 	for (i = 0; i < num_rows; i++)
 		b->row_array[i] = createRow(row_size);
 	b->num_rows = num_rows;
@@ -53,14 +65,14 @@ Board * createBoard(int num_rows, int row_size) {
 void freeBird(Board * b) {
 	int i, n = b->num_rows;
 	for (i = 0; i < n; i++)
-		free(b->row_array[i]);
+		freeRow(b->row_array[i]);
 	free(b->row_array);
 	free(b->answer);
 	free(b);
 }
 
-int input(char * str, int def) {
-	int val = def;
+int input(char * str, int deflt) {
+	int val = deflt;	//Set initially to default.
 	char buffer[BUF_SIZE] = {'\0'};
 	printf("%s", str);
 	if (fgets(buffer, BUF_SIZE, stdin) != NULL) {
@@ -81,10 +93,10 @@ void printBoard(Board * b) {
 	int i, j, y = b->num_rows, x = b->row_size;
 	for (i = 0; i < y; i++) {
 		for (j = 0; j < x; j++)
-			printf("%i ", b->row_array[i].code_pegs[j]);
+			printf("%i ", b->row_array[i]->code_pegs[j]);
 		printf(" ...  ");
 		for (j = 0; j < x; j++)
-			printf("%i ", b->row_array[i].key_pegs[j]);
+			printf("%i ", b->row_array[i]->key_pegs[j]);
 		printf("\n");
 	}
 }
