@@ -53,7 +53,7 @@ void freeRow(Row * r) {
 Board * createBoard(int num_rows, int row_size) {
 	Board * b = (Board *)malloc(sizeof(Board));
 	int i;
-	b->row_array = (Row **)malloc(sizeof(Row *));
+	b->row_array = (Row **)calloc(num_rows, sizeof(Row *));
 	for (i = 0; i < num_rows; i++)
 		b->row_array[i] = createRow(row_size);
 	b->num_rows = num_rows;
