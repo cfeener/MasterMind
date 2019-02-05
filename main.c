@@ -14,7 +14,7 @@
 typedef struct board {	//Top of Hierarchy
 	int num_rows;	//Maximum number of guesses
 	int row_size;	//Size of code_ and key_peg arrays.
-	struct row ** row_array;	//TODO: Array of pointers
+	struct row ** row_array;	//Array of pointers
 	int * answer;
 } Board;
 
@@ -37,10 +37,10 @@ Row * createRow(int row_size) {
 	r->code_pegs = (int *)calloc(row_size, sizeof(int));
 	r->key_pegs = (int *)calloc(row_size, sizeof(int));
 	int i; 
-	for (i = 0; i < row_size; i++)
+	for (i = 0; i < row_size; i++) {
 		r->code_pegs[i] = 0;
-	for (i = 0; i < row_size; i++)
 		r->key_pegs[i] = 0;
+	}
 	return r;
 }
 
@@ -53,7 +53,7 @@ void freeRow(Row * r) {
 Board * createBoard(int num_rows, int row_size) {
 	Board * b = (Board *)malloc(sizeof(Board));
 	int i;
-	b->row_array = (Row **)calloc(num_rows, sizeof(Row *));
+	b->row_array = (Row **)calloc(num_rows, sizeof(Row *));	//Array space
 	for (i = 0; i < num_rows; i++)
 		b->row_array[i] = createRow(row_size);
 	b->num_rows = num_rows;
