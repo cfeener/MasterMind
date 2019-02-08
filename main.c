@@ -1,4 +1,6 @@
-* Christopher Feener
+//TODO: Row_size and num_rows are likely swapped.
+
+/* Christopher Feener
  * Mastermind program
  * Started on 3 February 2019
  * This program is the codemaker currently.
@@ -10,6 +12,9 @@
 #include <stdbool.h>
 
 #define BUF_SIZE 512
+#define EMPTY 0
+#define WHITE 1
+#define RED 2
 
 typedef struct board {	//Top of Hierarchy
 	int num_rows;	//Maximum number of guesses
@@ -29,7 +34,8 @@ void setAnswer(Board * b) {
 	b->answer = (int *)calloc(n, sizeof(int));
 	srand(time(0));
 	for (i = 0; i < n; i++)
-		b->answer[i] = rand() % 4;
+		//b->answer[i] = rand() % n;
+		b->answer[i] = 1;
 }
 
 Row * createRow(int row_size) {
@@ -94,20 +100,44 @@ void printBoard(Board * b) {
 	for (i = 0; i < y; i++) {
 		for (j = 0; j < x; j++)
 			printf("%i ", b->row_array[i]->code_pegs[j]);
-		printf(" ...  ");
+		printf("\t\t");
 		for (j = 0; j < x; j++)
 			printf("%i ", b->row_array[i]->key_pegs[j]);
 		printf("\n");
 	}
 }
 
-bool checkGuess(Board * b, int * a) {
-	int i, n = b->row_size;
+bool checkGuess(Board * b, int * a, int curr_guess) {	//TODO: Wrong behavior
+	bool is_match = true;
+	int i, white = 0, red = 0, n = b->row_size;
+	Row * r = b->row_array[curr_guess];
+	int * ans = b->answer;
 	for (i = 0; i < n; i++) {
-		if (b->answer[i] != a[i]) 
-			return false;
+		if (ans[i] != a[i])
+			is_match = false;
+		else red++;	//Correct position
 	}
-	return true;
+	if (!is_match) {	//Place into row
+		for (i = 0; i < n; i++) {
+			r->code_pegs[i] = a[i];
+			int j; 
+			for (j = 0; j < n; j++) {
+				if (i == j) continue;
+				if (a[i] == ans[j])
+					white++;
+			}
+		}
+	}
+	white -= red;	//Correct letters minus position.
+	for (i = 0; i < n; i++) {
+		if (red > 0) {
+			r->key_pegs[i] = RED;
+			red--;
+		} else if (white > 0) {
+			r->key_pegs[i] = WHITE;
+		}
+	}
+	return is_match;
 }
 
 int main(void) {
@@ -131,14 +161,15 @@ int main(void) {
 		printBoard(B);
 		if (fgets(buffer, BUF_SIZE, stdin) == NULL) {
 			printf("Please enter a guess\n");
+			continue;
 		}
 		int a[4] = {0, 0, 0, 0};
 		if (sscanf(buffer, "%i %i %i %i", &a[0], &a[1], &a[2], &a[3]) != row_size) {
 			printf("Please enter 4 numbers\n");
 			continue;
 		}
-		if ((is_found = checkGuess(B, a)) == true) {
-			printf("Congratulations! You found the answer!");	//Check guess
+		if ((is_found = checkGuess(B, a, i)) == true) {
+			printf("Congratulations! You found the answer!\n");	//Check guess
 			break;
 		}
 		i++;
