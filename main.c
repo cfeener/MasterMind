@@ -1,4 +1,4 @@
-/* Christopher Feener
+* Christopher Feener
  * Mastermind program
  * Started on 3 February 2019
  * This program is the codemaker currently.
@@ -58,7 +58,7 @@ Board * createBoard(int num_rows, int row_size) {
 		b->row_array[i] = createRow(row_size);
 	b->num_rows = num_rows;
 	b->row_size = row_size;
-	setAnswer(b);	//Random generated
+	setAnswer(b);	//Randomly generated
 	return b;
 }
 
@@ -101,12 +101,20 @@ void printBoard(Board * b) {
 	}
 }
 
+bool checkGuess(Board * b, int * a) {
+	int i, n = b->row_size;
+	for (i = 0; i < n; i++) {
+		if (b->answer[i] != a[i]) 
+			return false;
+	}
+	return true;
+}
+
 int main(void) {
-	int num_colors = 8;
+	int num_colors = 6;
 	int num_row = 8;
 	int row_size = 4;
 
-	int buffer[BUF_SIZE] = {'\0'};
 	printf("Welcome to MasterMind->CodeMaker!\n");
 	num_colors = input("Colors (default is 8): ", num_colors);
 	num_row = input("Number of guesses (default is 8): ", num_row);
@@ -115,9 +123,31 @@ int main(void) {
 
 	Board * B = createBoard(num_row, row_size);
 
-	printBoard(B);
+	char buffer[BUF_SIZE] = {'\0'};
+	bool is_found = false;
+	int i = 0;
+	while (i < row_size) {
+		printf("Current board: \n");
+		printBoard(B);
+		if (fgets(buffer, BUF_SIZE, stdin) == NULL) {
+			printf("Please enter a guess\n");
+		}
+		int a[4] = {0, 0, 0, 0};
+		if (sscanf(buffer, "%i %i %i %i", &a[0], &a[1], &a[2], &a[3]) != row_size) {
+			printf("Please enter 4 numbers\n");
+			continue;
+		}
+		if ((is_found = checkGuess(B, a)) == true) {
+			printf("Congratulations! You found the answer!");	//Check guess
+			break;
+		}
+		i++;
+	}
 
-	printAns(B);
+	if (!is_found) {
+		printf("You lost. Answer: ");
+		printAns(B);
+	}
 
 	freeBird(B);
 	return 0;
