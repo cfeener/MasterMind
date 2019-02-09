@@ -32,8 +32,8 @@ void setAnswer(Board * b) {
 	b->answer = (int *)calloc(n, sizeof(int));
 	srand(time(0));
 	for (i = 0; i < n; i++)
-		//b->answer[i] = rand() % n;
-		b->answer[i] = 1;
+		b->answer[i] = rand() % n + 1;
+		//b->answer[i] = i + 1;
 }
 
 Row * createRow(int row_size) {
@@ -96,33 +96,48 @@ void printAns(Board * b) {
 void printBoard(Board * b) {
 	int i, j, y = b->num_rows, x = b->row_size;
 	for (i = 0; i < y; i++) {
-		for (j = 0; j < x; j++)
+		for (j = 0; j < x; j++) {
+			if (thing is -1 then print '_')
 			printf("%i ", b->row_array[i]->code_pegs[j]);
+		}
 		printf("\t\t");
-		for (j = 0; j < x; j++)
-			printf("%i ", b->row_array[i]->key_pegs[j]);
+		for (j = 0; j < x; j++) {
+			int dcpt = b->row_array[i]->key_pegs[j]; 
+			if (dcpt == RED) 
+				printf("Re ");
+			else if (dcpt == WHITE)
+				printf("Wh ");
+			else printf("__ ");
+		}
 		printf("\n");
 	}
 }
 
-bool checkGuess(Board * b, int * a, int curr_guess) {	//TODO: white = Wrong behavior
+bool checkGuess(Board * b, int * a, int curr_guess) {
 	bool is_match = true;
 	int i, white = 0, red = 0, n = b->row_size;
 	Row * r = b->row_array[curr_guess];
 	int * ans = b->answer;
-	for (i = 0; i < n; i++) {
+
+	bool is_checked[n];	//TODO: Checking for duplicates
+	for (i = 0; i < n; i++)
+		is_checked[i] = false;
+
+	for (i = 0; i < n; i++) {	//RED
 		if (ans[i] != a[i])
 			is_match = false;
 		else red++;	//Correct position
 	}
-	if (!is_match) {	//Place into row
+	if (!is_match) {	//WHITE
 		for (i = 0; i < n; i++) {
-			r->code_pegs[i] = a[i];
 			int j; 
 			for (j = 0; j < n; j++) {
-				if (i == j) continue;
-				if (a[i] == ans[j])
+				r->code_pegs[j] = a[j];
+				if ((i == j) || ()) continue;
+				if (ans[i] == a[j]) {
 					white++;
+					break;	//Each answer is compared to entries until match is found.
+				}
 			}
 		}
 	}
@@ -133,6 +148,7 @@ bool checkGuess(Board * b, int * a, int curr_guess) {	//TODO: white = Wrong beha
 			red--;
 		} else if (white > 0) {
 			r->key_pegs[i] = WHITE;
+			white--;
 		}
 	}
 	return is_match;
@@ -144,32 +160,38 @@ int main(void) {
 	int row_size = 4;
 
 	printf("Welcome to MasterMind->CodeMaker!\n");
-	num_colors = input("Colors (default is 8): ", num_colors);
-	num_rows = input("Number of guesses (default is 8): ", num_rows);
-	row_size = input("Length of code (default is 4): ", row_size);
+	num_colors = input("Colors (leave blank for default 8): ", num_colors);
+	num_rows = input("Number of guesses (leave blank for default 8): ", num_rows);
+	row_size = input("Length of code (leave blank for default 4): ", row_size);
 	printf("Colors: %i, Guesses: %i, Length: %i\n", num_colors, num_rows, row_size);
 
 	Board * B = createBoard(num_rows, row_size);
 
-	char buffer[BUF_SIZE] = {'\0'};
+	int i;
 	bool is_found = false;
-	int i = 0;
+	unsigned int a[row_size];
+	char buffer[BUF_SIZE] = {'\0'};
+	for (i = 0; i < row_size; i++)
+		a[i] = -1;
+	i = 0;
 	while (i < num_rows) {
 		printf("Current board: \n");
 		printBoard(B);
 		if (fgets(buffer, BUF_SIZE, stdin) == NULL) {
 			printf("Please enter a guess\n");
 			continue;
-		}
-		int a[4] = {0, 0, 0, 0};
+		}	//TODO: Variable size input
 		if (sscanf(buffer, "%i %i %i %i", &a[0], &a[1], &a[2], &a[3]) != row_size) {
-			printf("Please enter 4 numbers\n");
+			printf("Please enter %i numbers\n", row_size);
 			continue;
 		}
 		if ((is_found = checkGuess(B, a, i)) == true) {
 			printf("Congratulations! You found the answer!\n");	//Check guess
 			break;
 		}
+		int j;
+		for (j = 0; j < row_size; j++)
+			a[j] = 0;
 		i++;
 	}
 
