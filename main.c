@@ -1,5 +1,3 @@
-//TODO: Row_size and num_rows are likely swapped.
-
 /* Christopher Feener
  * Mastermind program
  * Started on 3 February 2019
@@ -107,7 +105,7 @@ void printBoard(Board * b) {
 	}
 }
 
-bool checkGuess(Board * b, int * a, int curr_guess) {	//TODO: Wrong behavior
+bool checkGuess(Board * b, int * a, int curr_guess) {	//TODO: white = Wrong behavior
 	bool is_match = true;
 	int i, white = 0, red = 0, n = b->row_size;
 	Row * r = b->row_array[curr_guess];
@@ -142,21 +140,21 @@ bool checkGuess(Board * b, int * a, int curr_guess) {	//TODO: Wrong behavior
 
 int main(void) {
 	int num_colors = 6;
-	int num_row = 8;
+	int num_rows = 8;
 	int row_size = 4;
 
 	printf("Welcome to MasterMind->CodeMaker!\n");
 	num_colors = input("Colors (default is 8): ", num_colors);
-	num_row = input("Number of guesses (default is 8): ", num_row);
+	num_rows = input("Number of guesses (default is 8): ", num_rows);
 	row_size = input("Length of code (default is 4): ", row_size);
-	printf("Colors: %i, Guesses: %i, Length: %i\n", num_colors, num_row, row_size);
+	printf("Colors: %i, Guesses: %i, Length: %i\n", num_colors, num_rows, row_size);
 
-	Board * B = createBoard(num_row, row_size);
+	Board * B = createBoard(num_rows, row_size);
 
 	char buffer[BUF_SIZE] = {'\0'};
 	bool is_found = false;
 	int i = 0;
-	while (i < row_size) {
+	while (i < num_rows) {
 		printf("Current board: \n");
 		printBoard(B);
 		if (fgets(buffer, BUF_SIZE, stdin) == NULL) {
