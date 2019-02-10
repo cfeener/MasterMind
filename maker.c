@@ -17,8 +17,9 @@
 typedef struct board {	//Top of Hierarchy
 	int num_rows;	//Maximum number of guesses
 	int row_size;	//Size of code_ and key_peg arrays.
-	int colors;
+	int num_colors;
 	struct row ** row_array;	//Array of pointers
+	bool dup_allowed;
 	int * answer;
 } Board;
 
@@ -29,11 +30,16 @@ typedef struct row {
 } Row;
 
 void setAnswer(Board * b) {
-	int i, n = b->colors;
+	int i, n = b->num_colors;
 	b->answer = (int *)calloc(n, sizeof(int));
-	srand(time(0));
-	for (i = 0; i < n; i++)
-		b->answer[i] = rand() % n + 1;
+	if (!b->dup_allowed) {	//TODO: Write a shuffling algo
+		for (i = 0; i < n; i++) 
+			b->answer[i] = i + 1;
+	} else {
+		srand(time(0));
+		for (i = 0; i < n; i++)
+			b->answer[i] = rand() % n + 1;
+	}
 }
 
 Row * createRow(int row_size) {
@@ -54,7 +60,7 @@ void freeRow(Row * r) {
 	free(r);
 }
 
-Board * createBoard(int num_rows, int row_size, int colors) {
+Board * createBoard(int num_rows, int row_size, int colors, bool dup_allowed) {
 	Board * b = (Board *)malloc(sizeof(Board));
 	int i;
 	b->row_array = (Row **)calloc(num_rows, sizeof(Row *));	//Array space
@@ -62,7 +68,8 @@ Board * createBoard(int num_rows, int row_size, int colors) {
 		b->row_array[i] = createRow(row_size);
 	b->num_rows = num_rows;
 	b->row_size = row_size;
-	b->colors = colors;
+	b->num_colors = colors;
+	b->dup_allowed = dup_allowed;
 	setAnswer(b);	//Randomly generated
 	return b;
 }
@@ -123,12 +130,8 @@ bool checkGuess(Board * b, int * a, int curr_guess) {
 	Row * r = b->row_array[curr_guess];
 	int * ans = b->answer;
 
-	bool is_checked[n];	//TODO: Checking for duplicates
-	for (i = 0; i < n; i++)
-		is_checked[i] = false;
-
 	for (i = 0; i < n; i++) {	//RED
-		r->code_pegs[i] = a[i];
+		r->code_pegs[i] = a[i];	//Insert value here.
 		if (ans[i] != a[i])
 			is_match = false;
 		else red++;	//Correct position
@@ -137,16 +140,15 @@ bool checkGuess(Board * b, int * a, int curr_guess) {
 		for (i = 0; i < n; i++) {
 			int j; 
 			for (j = 0; j < n; j++) {
-				if ((i == j) || (is_checked[j])) continue;	//TODO
 				if (ans[i] == a[j]) {
 					white++;
-					is_checked[j] = true;
+					a[j] = -1;	//Change value to -inf
 					break;	//Each answer is compared to entries until match is found.
 				}
 			}
 		}
 	}
-	//white -= red;	//Correct letters minus position.
+	white -= red;	//Correct letters minus position.
 	for (i = 0; i < n; i++) {
 		if (red > 0) {
 			r->key_pegs[i] = RED;
@@ -159,18 +161,34 @@ bool checkGuess(Board * b, int * a, int curr_guess) {
 	return is_match;
 }
 
+bool b_input(char * str) {
+	char temp[BUF_SIZE];
+	char buffer[BUF_SIZE] = {'\0'};
+	printf("%s", str);
+	if (fgets(buffer, BUF_SIZE, stdin) != NULL) {
+		if (sscanf(buffer, "%s", temp) == 1)
+			return true;
+	}
+	return false;
+}
+
 int main(void) {
 	int num_colors = 6;
 	int num_rows = 8;
 	int row_size = 4;
+	int dup_allowed = false;
 
 	printf("Welcome to MasterMind->CodeMaker!\n");
 	num_colors = input("Colors (leave blank for default 8): ", num_colors);
 	num_rows = input("Number of guesses (leave blank for default 8): ", num_rows);
 	row_size = input("Length of code (leave blank for default 4): ", row_size);
-	printf("Colors: %i, Guesses: %i, Length: %i\n", num_colors, num_rows, row_size);
+	dup_allowed = b_input("NO duplicates in answer (leave blank for default): ");
+	printf("Colors: %i, Guesses: %i, Length: %i, ", num_colors, num_rows, row_size);
+	if (dup_allowed)
+		printf("Duplicates in answer\n");
+	else printf("Duplicates NOT in answer\n");
 
-	Board * B = createBoard(num_rows, row_size, num_colors);
+	Board * B = createBoard(num_rows, row_size, num_colors, dup_allowed);
 
 	int i;
 	bool is_found = false;
