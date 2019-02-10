@@ -17,6 +17,7 @@
 typedef struct board {	//Top of Hierarchy
 	int num_rows;	//Maximum number of guesses
 	int row_size;	//Size of code_ and key_peg arrays.
+	int colors;
 	struct row ** row_array;	//Array of pointers
 	int * answer;
 } Board;
@@ -28,7 +29,7 @@ typedef struct row {
 } Row;
 
 void setAnswer(Board * b) {
-	int i, n = b->row_size;
+	int i, n = b->colors;
 	b->answer = (int *)calloc(n, sizeof(int));
 	srand(time(0));
 	for (i = 0; i < n; i++)
@@ -53,7 +54,7 @@ void freeRow(Row * r) {
 	free(r);
 }
 
-Board * createBoard(int num_rows, int row_size) {
+Board * createBoard(int num_rows, int row_size, int colors) {
 	Board * b = (Board *)malloc(sizeof(Board));
 	int i;
 	b->row_array = (Row **)calloc(num_rows, sizeof(Row *));	//Array space
@@ -61,6 +62,7 @@ Board * createBoard(int num_rows, int row_size) {
 		b->row_array[i] = createRow(row_size);
 	b->num_rows = num_rows;
 	b->row_size = row_size;
+	b->colors = colors;
 	setAnswer(b);	//Randomly generated
 	return b;
 }
@@ -135,15 +137,16 @@ bool checkGuess(Board * b, int * a, int curr_guess) {
 		for (i = 0; i < n; i++) {
 			int j; 
 			for (j = 0; j < n; j++) {
-				if ((i == j) || (false)) continue;	//TODO
+				if ((i == j) || (is_checked[j])) continue;	//TODO
 				if (ans[i] == a[j]) {
 					white++;
+					is_checked[j] = true;
 					break;	//Each answer is compared to entries until match is found.
 				}
 			}
 		}
 	}
-	white -= red;	//Correct letters minus position.
+	//white -= red;	//Correct letters minus position.
 	for (i = 0; i < n; i++) {
 		if (red > 0) {
 			r->key_pegs[i] = RED;
@@ -167,7 +170,7 @@ int main(void) {
 	row_size = input("Length of code (leave blank for default 4): ", row_size);
 	printf("Colors: %i, Guesses: %i, Length: %i\n", num_colors, num_rows, row_size);
 
-	Board * B = createBoard(num_rows, row_size);
+	Board * B = createBoard(num_rows, row_size, num_colors);
 
 	int i;
 	bool is_found = false;
