@@ -41,7 +41,7 @@ Row * createRow(int row_size) {
 	r->key_pegs = (int *)calloc(row_size, sizeof(int));
 	int i; 
 	for (i = 0; i < row_size; i++) {
-		r->code_pegs[i] = 0;
+		r->code_pegs[i] = -1;
 		r->key_pegs[i] = 0;
 	}
 	return r;
