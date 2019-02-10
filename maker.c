@@ -33,7 +33,6 @@ void setAnswer(Board * b) {
 	srand(time(0));
 	for (i = 0; i < n; i++)
 		b->answer[i] = rand() % n + 1;
-		//b->answer[i] = i + 1;
 }
 
 Row * createRow(int row_size) {
@@ -97,8 +96,11 @@ void printBoard(Board * b) {
 	int i, j, y = b->num_rows, x = b->row_size;
 	for (i = 0; i < y; i++) {
 		for (j = 0; j < x; j++) {
-			if (thing is -1 then print '_')
-			printf("%i ", b->row_array[i]->code_pegs[j]);
+			int code = b->row_array[i]->code_pegs[j];
+			if (code == -1)
+				printf("_ ");
+			else 
+				printf("%i ", code);
 		}
 		printf("\t\t");
 		for (j = 0; j < x; j++) {
@@ -124,6 +126,7 @@ bool checkGuess(Board * b, int * a, int curr_guess) {
 		is_checked[i] = false;
 
 	for (i = 0; i < n; i++) {	//RED
+		r->code_pegs[i] = a[i];
 		if (ans[i] != a[i])
 			is_match = false;
 		else red++;	//Correct position
@@ -132,8 +135,7 @@ bool checkGuess(Board * b, int * a, int curr_guess) {
 		for (i = 0; i < n; i++) {
 			int j; 
 			for (j = 0; j < n; j++) {
-				r->code_pegs[j] = a[j];
-				if ((i == j) || ()) continue;
+				if ((i == j) || (false)) continue;	//TODO
 				if (ans[i] == a[j]) {
 					white++;
 					break;	//Each answer is compared to entries until match is found.
