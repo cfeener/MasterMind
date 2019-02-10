@@ -29,14 +29,25 @@ typedef struct row {
 	int * key_pegs;	//Either empty, white, or red
 } Row;
 
+void swap(int * a, int * b) {
+	*a = *a ^ *b;
+	*b = *a ^ *b;
+	*a = *a ^ *b;
+}
+
 void setAnswer(Board * b) {
 	int i, n = b->num_colors;
 	b->answer = (int *)calloc(n, sizeof(int));
-	if (!b->dup_allowed) {	//TODO: Write a shuffling algo
-		for (i = 0; i < n; i++) 
+	srand(time(0));
+	if (!b->dup_allowed) {	//Based on https://www.geeksforgeeks.org/shuffle-a-given-array-using-fisher-yates-shuffle-algorithm/
+		for (i = 0; i < n; i++) {	//Initial set of numbers
 			b->answer[i] = i + 1;
-	} else {
-		srand(time(0));
+		}
+		for (i = n - 1; i > 0; i--)  {	//Shuffle numbers using random indices
+			int j = rand() % (i + 1);
+			swap(&b->answer[i], &b->answer[j]);
+		}
+	} else {	//Duplicates allowed? Just random numbers, then!
 		for (i = 0; i < n; i++)
 			b->answer[i] = rand() % n + 1;
 	}
@@ -192,7 +203,7 @@ int main(void) {
 
 	int i;
 	bool is_found = false;
-	unsigned int a[row_size];
+	unsigned int a[row_size];	//Guess cannot be negative! (-1 = blank)
 	char buffer[BUF_SIZE] = {'\0'};
 	for (i = 0; i < row_size; i++)
 		a[i] = -1;
@@ -204,9 +215,10 @@ int main(void) {
 			printf("Please enter a guess\n");
 			continue;
 		}	//TODO: Variable size input
-		if (sscanf(buffer, "%i %i %i %i", &a[0], &a[1], &a[2], &a[3]) != row_size) {
-			printf("Please enter %i numbers\n", row_size);
-			continue;
+		if (sscanf(buffer, "%i %i %i %i %i %i %i %i", 
+			&a[0], &a[1], &a[2], &a[3], &a[4], &a[5], &a[6], &a[7]) != row_size) {
+				printf("Please enter %i numbers\n", row_size);
+				continue;
 		}
 		if ((is_found = checkGuess(B, a, i)) == true) {
 			printf("Congratulations! You found the answer!\n");	//Check guess
