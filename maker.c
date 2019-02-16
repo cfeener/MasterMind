@@ -4,7 +4,7 @@
  * This program is the codemaker currently.
  */
 
-#include <stdio.h>
+/*#include <stdio.h>
 #include <stdlib.h>	//For malloc() and free()
 #include <time.h>	//For time()
 #include <stdbool.h>
@@ -181,7 +181,9 @@ bool b_input(char * str) {
 			return true;
 	}
 	return false;
-}
+}*/
+
+#include "code.h"
 
 int main(void) {
 	int num_colors = 6;
