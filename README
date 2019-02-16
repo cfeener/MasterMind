@@ -4,3 +4,7 @@ Email: christopher.feener@outlook.com
 
 Files:
 	README
+	maker.c
+	(output image)
+
+	Use GCC to compile. 
