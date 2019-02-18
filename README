@@ -5,6 +5,8 @@ Email: christopher.feener@outlook.com
 Files:
 	README
 	maker.c
-	(output image)
+	breaker.c
+	Makefile
+	(output picture)
 
 	Use GCC to compile. 
