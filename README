@@ -3,8 +3,23 @@ Name: Christopher Feener
 Email: christopher.feener@outlook.com
 
 Files:
-	README
-	maker.c
+	README:
+		This file.
+
+	code.h:
+		Header file with functions from initial maker.c file.
+
+	maker.c:
+		Main function for code maker.
+
+	breaker.c:
+		Functions unique to code breaker.
 	(output image)
 
-	Use GCC to compile. 
+Compile:
+	Use 'make' for code maker, and 'make breaker' for code breaker. To clean, 'make clean'.
+
+Description:
+	This is a flexible game of Master Mind (values for colors can be set to MAX_INT, for 
+	example.) Notably, the Fisher-Yates algorithm is used to randomly shuffle values in 
+	the answer when no duplicates are allowed. 

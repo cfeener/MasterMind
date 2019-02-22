@@ -13,7 +13,7 @@ int main(void) {
 	int dup_allowed = false;
 
 	printf("Welcome to MasterMind->CodeMaker!\n");
-	num_colors = input("Colors (leave blank for default 8): ", num_colors);
+	num_colors = input("Colors (leave blank for default 6): ", num_colors);
 	num_rows = input("Number of guesses (leave blank for default 8): ", num_rows);
 	row_size = input("Length of code (leave blank for default 4): ", row_size);
 	dup_allowed = b_input("NO duplicates in answer (leave blank for default): ");

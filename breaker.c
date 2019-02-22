@@ -4,6 +4,21 @@
 
 #include "code.h"
 
+/*
+        int i, n = b->num_colors;
+        b->answer = (int *)calloc(n, sizeof(int));
+        srand(time(0));
+        if (!b->dup_allowed) {  //Based on https://www.geeksforgeeks.org/shuffle-a-given-array-using-fisher-yates-shuffle-algorithm/
+                for (i = 0; i < n; i++) {       //Initial set of numbers
+                        b->answer[i] = i + 1;
+                }
+                for (i = n - 1; i > 0; i--)  {  //Shuffle numbers using random indices
+                        int j = rand() % (i + 1);
+                        swap(&b->answer[i], &b->answer[j]);
+                }
+        }
+*/
+
 int * makeGuess(Board * b, int i) {	//Random at first
 	int n = b->row_size, mod = b->num_colors;
 	int j;
