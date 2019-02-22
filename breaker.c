@@ -22,7 +22,7 @@
 int * makeGuess(Board * b, int i) {	//Random at first
 	int n = b->row_size, mod = b->num_colors;
 	int j;
-	srand(time(0));
+	srand(time(0) + 1);
 	int * a = calloc(n, sizeof(int));
 	for (j = 0; j < n; j++) {
 		a[j] = rand() % mod + 1;

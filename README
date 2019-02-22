@@ -3,6 +3,7 @@ Name: Christopher Feener
 Email: christopher.feener@outlook.com
 
 Files:
+<<<<<<< HEAD
 	README:
 		This file.
 
@@ -15,6 +16,13 @@ Files:
 	breaker.c:
 		Functions unique to code breaker.
 	(output image)
+=======
+	README
+	maker.c
+	breaker.c
+	Makefile
+	(output picture)
+>>>>>>> ce5f087dcd1a550a99e1b9249f04411ef4875ea5
 
 Compile:
 	Use 'make' for code maker, and 'make breaker' for code breaker. To clean, 'make clean'.
