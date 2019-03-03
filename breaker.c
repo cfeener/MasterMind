@@ -11,7 +11,9 @@ int * makeGuess(Board * b, int i) {	//Random at first
 		int j;
 		for (j = 0; j < n; j++) 
 			a[j] = j;
-	} else {	//Using Fisher-Yates shuffle. 
+	} else {
+		//TODO: While guess is not satisfactory, loop.
+		//Using Fisher-Yates shuffle. 
 		int j;
 		for (j = 0; j < n; j++)
 			a[j] = j + 1;
